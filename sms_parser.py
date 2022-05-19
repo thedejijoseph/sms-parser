@@ -9,7 +9,7 @@
 import sys
 from datetime import datetime
 
-import requests as r
+# import requests as r
 
 # In[155]:
 
@@ -74,7 +74,7 @@ def parse(payload):
             "date": datetime
         }
     """
-    
+    assert type(payload) == dict, f"payload: type {type(payload)} is not dict"
 
     selected_handler = handlers.get(payload['sender'], None)
     if selected_handler:
@@ -110,21 +110,21 @@ class Handler:
             "message": self.message,
             "error": "could not parse 'message'"
         }
-
+    def process(self):
+        results = self.string_processor()
+        if results:
+            # change datetime to json-serializable format
+            results['datetime'] = results['datetime'].isoformat()
+            return results
+        else:
+            return self.empty
+    
 
 # In[477]:
-
 
 class FirstBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
-    
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
     
     def string_processor(self):
         tx, acc_no, _, amt, _, date, time, _, *desc = self.message.split(" ")
@@ -162,13 +162,6 @@ class FirstBankHandler(Handler):
 class AccessBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
-    
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
     
     def string_processor(self):
         tx, amt, acc_no, desc, date, avail_bal, total = self.message.split("\n")
@@ -216,13 +209,6 @@ class GTBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
     
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
-    
     def string_processor(self):
         if not self.message.startswith("Acc"):
             return None
@@ -269,13 +255,6 @@ class KeystoneBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
     
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
-    
     def string_processor(self):
         tx, acc_no, amt, desc, date_time, bal, _ = self.message.split("\n")
         
@@ -317,13 +296,6 @@ class KeystoneBankHandler(Handler):
 class PolarisBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
-    
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
     
     def string_processor(self):
         tx, acc_no, amt, desc, bal, date_time, _ = self.message.split("\n")
@@ -376,13 +348,6 @@ class SterlingBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
     
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
-    
     def string_processor(self):
         if self.message.startswith("Money"):
             if "Alert!" in self.message:
@@ -400,7 +365,7 @@ class SterlingBankHandler(Handler):
 
                 amount = amt[9:].strip().replace(',', '')
                 self.amount = float(amount)
-                self.currency = "NGN" if amt[5:8] == "N" else None
+                self.currency = amt[5:8]
 
                 # 'Av.Bal: NGN ***.' is expected
                 bal = bal[12:].replace(',', '')
@@ -500,13 +465,6 @@ class StandardCharteredHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
     
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
-    
     def string_processor(self):
         if not "Alert!" in self.message:
             return None
@@ -552,13 +510,6 @@ class UBAHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
     
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
-    
     def string_processor(self):
         if not self.message.startswith("Txn"):
             return None
@@ -603,13 +554,6 @@ class UBAHandler(Handler):
 class UnionBankHandler(Handler):
     def __init__(self, request):
         super().__init__(request)
-    
-    def process(self):
-        results = self.string_processor()
-        if results:
-            return results
-        else:
-            return self.empty
     
     def string_processor(self):
         acc_no, amt, desc, date_time, bal = self.message.split("\n")
