@@ -1,65 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[493]:
-
-
-# import re
-
 import sys
 from datetime import datetime
-
-# import requests as r
-
-# In[155]:
-
-# ignoring the lines below. used for dev and tests
-"""
-import requests as r
-
-first_bank = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBgu2abmqk202203249586"
-access_bank = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSB2kug63rt202203814200"
-gt_bank = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBido4xo6720220411202755"
-keystone_bank_1 = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBqho5jf19202204617034"
-keystone_bank_2 = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBx3zu9cil202205177018"
-poliaris_1 = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSB5re47yqf2022047231557"
-poliaris_2 = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSB7dxrbtnv20220410151115"
-sterling = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBlsl4tvra2022041114058"
-standard = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBmib4r9ss20220478215"
-uba = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBrefruh08202204484746"
-union_bank = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBkcboxo2i2022046231250"
-wema_bank = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSByooviikl2022032312748"
-zenith = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBir4ngg1v2022032882648"
-zenith_2 = "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBqoixnexo2022041213740"
-
-bank_urls = {
-    "first_bank": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBgu2abmqk202203249586",
-    "access_bank": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSB2kug63rt202203814200",
-    "gt_bank": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBido4xo6720220411202755",
-    "keystone_bank_1": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBqho5jf19202204617034",
-    "keystone_bank_2": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBx3zu9cil202205177018",
-    "poliaris_1": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSB5re47yqf2022047231557",
-    "poliaris_2": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSB7dxrbtnv20220410151115",
-    "sterling": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBlsl4tvra2022041114058",
-    "standard": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBmib4r9ss20220478215",
-    "uba": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBrefruh08202204484746",
-    "union_bank": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBkcboxo2i2022046231250",
-    "wema_bank": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSByooviikl2022032312748",
-    "zenith": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBir4ngg1v2022032882648",
-    "zenith_2": "https://worker-service-prod.herokuapp.com/transactions/fetch/mystash/MSBqoixnexo2022041213740"
-}
-
-messages = {}
-for bank, url in bank_urls.items():
-    resp = r.get(url)
-    banks_messages = resp.json()
-    messages[bank] = banks_messages
-
-def test(bank):
-    for payload in messages[bank]:
-        entry(payload)
-"""
-# In[488]:
 
 
 def parse(payload):
@@ -84,9 +27,6 @@ def parse(payload):
         return {
             "error": f"no handler for {payload['sender']}"
         }
-
-
-# In[476]:
 
 
 class Handler:
@@ -118,11 +58,11 @@ class Handler:
             return results
         else:
             return self.empty
-    
-
-# In[477]:
 
 class FirstBankHandler(Handler):
+    """Parse First Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -155,11 +95,10 @@ class FirstBankHandler(Handler):
         
         return result
 
-
-# In[478]:
-
-
 class AccessBankHandler(Handler):
+    """Parse Access Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -201,11 +140,10 @@ class AccessBankHandler(Handler):
         
         return result
 
-
-# In[501]:
-
-
 class GTBankHandler(Handler):
+    """Parse GT Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -247,11 +185,10 @@ class GTBankHandler(Handler):
         
         return result
 
-
-# In[479]:
-
-
 class KeystoneBankHandler(Handler):
+    """Parse Keystone Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -289,11 +226,10 @@ class KeystoneBankHandler(Handler):
         
         return result
 
-
-# In[480]:
-
-
 class PolarisBankHandler(Handler):
+    """Parse Polaris Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -331,19 +267,8 @@ class PolarisBankHandler(Handler):
         
         return result
 
-
-# In[511]:
-
-
 class SterlingBankHandler(Handler):
-    """
-    Examples:
-    
-    Money In Alert. \nNGN11,000.00 has just arrived from Paystack into **9032 at 7:15 AM 19-Apr-2022 \nYou now have: NGN ***."
-    
-    Money Out Alert!\nAcc#: **9032\nDesc: USSD/Airtime purchased of Amt 200.00 to Mobile 09126922679. RefID: 23\n09-May-2022 @ 5:32 PM\nAmt: NGN 200.00 \nAv.Bal: NGN ***"
-    
-    Debit Alert!\nAcc#: **9032\nDesc: USSD/Airtime purchased of Amt 200.00 to Mobile 09126308040. RefID: 221473\n22-Apr-2022 @ 7:52 PM\nAmt: NGN 200.00 \nAv.Bal: NGN ***"
+    """Parse Sterling Bank SMS
     """
     def __init__(self, request):
         super().__init__(request)
@@ -457,11 +382,10 @@ class SterlingBankHandler(Handler):
         
         return result
 
-
-# In[482]:
-
-
 class StandardCharteredHandler(Handler):
+    """Parse StandardChartered Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -502,11 +426,10 @@ class StandardCharteredHandler(Handler):
         
         return result
 
-
-# In[483]:
-
-
 class UBAHandler(Handler):
+    """Parse UBA SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -547,11 +470,10 @@ class UBAHandler(Handler):
         
         return result
 
-
-# In[484]:
-
-
 class UnionBankHandler(Handler):
+    """Parse Union Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -589,19 +511,10 @@ class UnionBankHandler(Handler):
         
         return result
 
-
-# In[507]:
-
-
-text = "Acct: **5287\nDR: NGN5,500.00, COM+VAT:26.88\nDesc: MOBILE/UNION Transfer to Chisom Chisom Okpara - NA\nDT: 12/APR/2022 17:00:01\nAvailable Bal: NGN61,113.99CR"
-
-text.split('\n')
-
-
-# In[485]:
-
-
 class WemaBankHandler(Handler):
+    """Parse Wema Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -646,11 +559,10 @@ class WemaBankHandler(Handler):
         
         return result
 
-
-# In[486]:
-
-
 class ZenithBankHandler(Handler):
+    """Parse Zenith Bank SMS
+    """
+
     def __init__(self, request):
         super().__init__(request)
     
@@ -696,9 +608,6 @@ class ZenithBankHandler(Handler):
         return result
 
 
-# In[487]:
-
-
 handlers = {
     "FirstBank": FirstBankHandler,
     "AccessBank": AccessBankHandler,
@@ -713,46 +622,3 @@ handlers = {
     "WemaBank": WemaBankHandler,
     "ZENITHBANK": ZenithBankHandler
 }
-
-
-# In[508]:
-
-banks = [ 'zenithbank', 'wemabank', 'unionbank', 'uba',  'stanchart', 'sterling', 'polarisbank', 'keystone', 'gtbank', 'accessbank', 'firstbank']
-results = {}
-errors = []
-
-def test_check():
-    for bank in banks:
-        print(f"processing {bank}")
-        
-        resp = r.get(f"https://worker-service-prod.herokuapp.com/transactions/test/processor?bank={bank}&limit=25")
-        message_list = resp.json()
-        
-        parsed_list = []
-        count = 1
-        for payload in message_list:
-            print(f"\t{count} of {len(message_list)}")
-            
-            try:
-                parse_result = entry(payload)
-                parsed_list.append(parse_result)
-            except:
-                print(f"error: {payload.get('message')[:40]}")
-                e = sys.exc_info()[0]
-                errors.append({
-                    "bank": bank,
-                    "error": e,
-                    "input": payload
-                })
-            count += 1
-        
-        results[bank] = {
-            "input": message_list,
-            "output": parsed_list
-        }
-
-# test_check()
-
-# print test results
-for bank in results:
-    print(f"{bank}\n\t{len(results[bank]['output'])} of {len(results[bank]['input'])}")
