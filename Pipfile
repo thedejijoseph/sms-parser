@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 starlette = "*"
 uvicorn = "*"
+pyyaml = "*"
 
 [dev-packages]
 

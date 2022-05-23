@@ -4,9 +4,16 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.routing import Route
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
+from starlette.schemas import SchemaGenerator
 
 import sms_parser
 
+schemas = SchemaGenerator(
+    {"openapi": "3.0.0", "info": {"title": "SMS Parser", "version": "1.0"}}
+)
+
+async def openapi_schema(request):
+    return schemas.OpenAPIResponse(request=request)
 
 async def not_found(request: Request, exc: HTTPException):
     return JSONResponse({
@@ -33,6 +40,14 @@ async def homepage(request):
 
 class Parse(HTTPEndpoint):
     async def post(self, request):
+        """
+        responses:
+            200:
+                description: A list of users.
+                examples:
+                    [{"username": "tom"}, {"username": "lucy"}]
+        """
+
         payload = await request.json()
         result = sms_parser.parse(payload)
         if result.get('error'):
@@ -52,6 +67,7 @@ class Parse(HTTPEndpoint):
 
 app = Starlette(debug=False, routes=[
     Route('/', homepage),
-    Route('/parse', Parse)
+    Route('/parse', Parse),
+    Route('/schema', endpoint=openapi_schema, include_in_schema=False)
 ],
 exception_handlers=exception_handlers)
